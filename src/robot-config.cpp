@@ -25,16 +25,15 @@ smartdrive Drivetrain = smartdrive(leftDrive, rightDrive,
  */
 
 
-static bool stopVexProgram = false;
-long long currentTime = 0;
-Timer checkErrors{"AAA"};
-Timer programLoop{"Time to complete: "};
-double totDegrees = 0;
+static bool stopVexProgram = false; // Below below
+long long currentTime = 0; // And below
+Timer checkErrors{"AAA"}; // Outside since vex's thread implementation is a little less free than C++'s
+double totDegrees = 0; // Outside for the same reason as above
 
 void startSecondThread() {
   while(!stopVexProgram) {
     long long time = checkErrors.getTime() - currentTime;
-    if(time >= 1000) {
+    if(time >= 5000) {
       Brain.Screen.printAt(10, 20, "Main thread is stalling!");
     } else {
       Brain.Screen.printAt(10, 20, "Main thread is working! ");
@@ -49,6 +48,7 @@ void multiDrive(double totDegrees) {
 void vexcodeInit(void) {
   checkErrors.start();
   thread errorChecker{startSecondThread};
+  Timer programLoop{"Total runtime"};
   programLoop.start();
   int tick = 0;
   while(!stopVexProgram) {
@@ -59,23 +59,24 @@ void vexcodeInit(void) {
     // Loop inside here
     // 30 * 3.14 * 1/4 = each wheel
     // 180 degrees = 10.5
-    double randomAdjuster = 0;
-
     double distanceBetweenWheels = 29.5; // Centimeters
     double wheelDiameter = 10.5; // Centimeters
-    double distance = distanceBetweenWheels * M_PI_2;
+    double distance = distanceBetweenWheels * M_PI_2; // We don't divide by 4 since we're using 2 wheels to turn
     double rotations = distance / wheelDiameter;
-    totDegrees = (rotations * 180. / M_PI) + randomAdjuster; // The 5 is to adjust for some random offset
+    // totDegrees is outside of the function due to some lambda weirdness down below
+    totDegrees = (rotations * 180. / M_PI);
 
     Drivetrain.setDriveVelocity(75, percent);
     Drivetrain.driveFor(6*11, inches);
     Drivetrain.setDriveVelocity(20, percent);
-    thread dd{[](){leftDrive.spinFor(-totDegrees, degrees);}};
-    rightDrive.spinFor(totDegrees, degrees);
+    if(tick < 3) { // Don't do the last rotation to save time
+      // Run one of the motors on another thread so both can turn simultaneously using a lambda
+      thread dd{[](){leftDrive.spinFor(-totDegrees, degrees);}};
+      rightDrive.spinFor(totDegrees, degrees);
+    }
     currentTime = checkErrors.getTime();
     tick++;
-   //rightDrive.spinFor(1.34159203, rev);
   }
   double totalTime = (((double) programLoop.getTime()) / 1000.);
-  Brain.Screen.printAt(10, 40, "Total Time: %f", totalTime);
+  Brain.Screen.printAt(10, 40, "Total time to run program: %f", totalTime);
 }
