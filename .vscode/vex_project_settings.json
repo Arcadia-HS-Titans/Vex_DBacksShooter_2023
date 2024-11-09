@@ -1,16 +1,16 @@
 {
 	"extension": {
-		"version": "0.4.2",
+		"version": "0.6.0",
 		"json": 1
 	},
 	"project": {
-		"name": "Hit",
+		"name": "PitchHomeRun",
 		"description": "Batting program",
-		"creationDate": "5/19/2023, 3:21:53 PM",
+		"creationDate": "Sat, 31 Aug 2024 17:45:57 GMT",
 		"platform": "V5",
 		"language": "cpp",
-		"slot": 4,
-		"sdkVersion": "V5_20220726_10_00_00",
+		"slot": 2,
+		"sdkVersion": "V5_20240223_11_00_00",
 		"cpp": {
 			"includePath": []
 		}

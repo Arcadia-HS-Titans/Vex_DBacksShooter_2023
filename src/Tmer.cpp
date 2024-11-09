@@ -22,7 +22,3 @@ long long Timer::getTime() {
     time = end-start;
     return time;
 }
-
-Timer::~Timer() {
-    stop(false);
-}

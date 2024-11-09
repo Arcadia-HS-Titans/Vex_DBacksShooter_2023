@@ -14,7 +14,6 @@ struct Timer {
      * Once constructed, initialized startTime with the current time
      */
     explicit Timer(std::string &&name);
-    ~Timer();
 
     /**
      * Made in case the same object wants to reset its startTime
